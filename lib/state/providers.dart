@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/day.dart';
@@ -9,7 +8,6 @@ import '../data/repositories/settings_repository.dart';
 import '../data/repositories/stats_repository.dart';
 import '../data/repositories/workout_repository.dart';
 import '../domain/app_settings.dart';
-import '../domain/badges/badge_catalog.dart';
 import '../domain/plan/plan_templates.dart';
 import '../domain/stats/stats_engine.dart';
 import '../domain/streak/streak_engine.dart';
@@ -185,8 +183,6 @@ final exercisesWithHistoryProvider = FutureProvider<List<ExerciseRow>>((
   return ref.watch(statsRepositoryProvider).exercisesWithHistory();
 });
 
-final selectedProgressExerciseProvider = StateProvider<int?>((ref) => null);
-
 final exerciseProgressProvider = FutureProvider.family<ExerciseProgress?, int>((
   ref,
   id,
@@ -243,11 +239,6 @@ final earnedBadgesProvider = StreamProvider<Set<String>>((ref) async* {
   await for (final rows in db.watchBadges()) {
     yield {for (final r in rows) r.code};
   }
-});
-
-final badgeProgressProvider = Provider<({int earned, int total})>((ref) {
-  final earned = ref.watch(earnedBadgesProvider).valueOrNull ?? const {};
-  return (earned: earned.length, total: BadgeCatalog.all.length);
 });
 
 // ---------------------------------------------------------------------- plan
@@ -307,14 +298,8 @@ void refreshAll(WidgetRef ref) {
   ref.invalidate(muscleSplitProvider);
 }
 
-/// Same as [refreshAll] but usable from a `Ref` outside the widget tree.
-void refreshAllFromRef(Ref ref) {
-  ref.invalidate(historyProvider);
-  ref.invalidate(lifetimeTotalsProvider);
-  ref.invalidate(windowedActivityProvider);
-  ref.invalidate(personalRecordsProvider);
-  ref.invalidate(exercisesWithHistoryProvider);
-  ref.invalidate(resumableWorkoutProvider);
-  ref.invalidate(muscleSplitProvider);
-  if (kDebugMode) debugPrint('ExStreak: derived providers refreshed');
-}
+/// Which weekdays the user actually trains on, 1 = Monday … 7 = Sunday.
+final weekdayDistributionProvider = FutureProvider<Map<int, int>>((ref) async {
+  ref.watch(activityProvider);
+  return ref.watch(statsRepositoryProvider).weekdayDistribution();
+});

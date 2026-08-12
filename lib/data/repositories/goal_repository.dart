@@ -99,24 +99,4 @@ class GoalRepository {
   }
 
   Future<void> delete(int id) => _db.deleteGoal(id);
-
-  Future<void> archive(int id) =>
-      _db.updateGoal(id, const GoalsCompanion(isArchived: Value(true)));
-
-  /// Marks a goal done by hand, for targets the app cannot observe.
-  Future<void> markComplete(int id) => _db.updateGoal(
-    id,
-    GoalsCompanion(
-      isCompleted: const Value(true),
-      completedDayKey: Value(Day.today().key),
-    ),
-  );
-
-  Future<void> reopen(int id) => _db.updateGoal(
-    id,
-    const GoalsCompanion(
-      isCompleted: Value(false),
-      completedDayKey: Value(null),
-    ),
-  );
 }

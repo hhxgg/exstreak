@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExStreak — Privacy Policy</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f6f6f9; --border: #e2e2ea;
+    --text: #15151c; --muted: #5a5a68; --accent: #e23a18;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0f; --surface: #16161d; --border: #26262f;
+      --text: #f5f5f7; --muted: #9e9eac; --accent: #ff4b2b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 2.5rem 1.25rem 5rem;
+    background: var(--bg); color: var(--text);
+    font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 46rem; margin: 0 auto; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 .25rem; letter-spacing: -.02em; }
+  h2 { font-size: 1.2rem; margin: 2.5rem 0 .75rem; letter-spacing: -.01em; }
+  .updated { color: var(--muted); font-size: .9rem; margin: 0 0 2rem; }
+  p, li { color: var(--text); }
+  .lede { font-size: 1.05rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .95rem; display: block; overflow-x: auto; }
+  th, td { text-align: left; padding: .7rem .8rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; }
+  .callout {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: .5rem; padding: 1rem 1.15rem; margin: 1.5rem 0;
+  }
+  .callout p { margin: 0; }
+  a { color: var(--accent); }
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .9rem; }
+  code { background: var(--surface); padding: .12em .4em; border-radius: .25rem; font-size: .9em; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>ExStreak Privacy Policy</h1>
+<p class="updated">Last updated: 12 August 2026</p>
+
+<p class="lede">
+  ExStreak does not collect, transmit or sell your personal data. There is no
+  account, no server and no analytics. Everything you log stays on your phone.
+</p>
+
+<div class="callout">
+  <p><strong>In one sentence:</strong> ExStreak stores your training data in a
+  database on your own device, never uploads it anywhere, and works entirely
+  offline.</p>
+</div>
+
+<h2>What ExStreak stores on your device</h2>
+<p>
+  The app saves the following locally, in a SQLite database and in Android's
+  app preferences. None of it leaves your phone.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Data</th><th>Why it exists</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Workouts, sets, reps, weights, durations</td>
+      <td>To show your history, statistics and personal records.</td>
+    </tr>
+    <tr>
+      <td>Daily activity and streak history</td>
+      <td>To calculate your current and longest streak.</td>
+    </tr>
+    <tr>
+      <td>Goals and earned badges</td>
+      <td>To track progress toward targets you set.</td>
+    </tr>
+    <tr>
+      <td>A display name, motto and chosen avatar</td>
+      <td>Optional. Used only to personalise the app's own screens. The avatar
+          is one of a fixed set of emoji — there is no photo upload.</td>
+    </tr>
+    <tr>
+      <td>Optional age, height and weight</td>
+      <td>Optional. Entered during setup, used only to display your figures in
+          your preferred units. You can skip this entirely.</td>
+    </tr>
+    <tr>
+      <td>App preferences</td>
+      <td>Theme, units, rest times, reminder time, rep-counting mode.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>What ExStreak does <em>not</em> do</h2>
+<ul>
+  <li>It does not create an account or ask for an email address.</li>
+  <li>It does not upload your training data to any server.</li>
+  <li>It contains no analytics, tracking or advertising SDK.</li>
+  <li>It does not access your contacts, photos, camera, microphone or location.</li>
+  <li>It does not share or sell data to third parties, because it has no way
+      to send data anywhere.</li>
+</ul>
+
+<h2>Permissions and why they are requested</h2>
+
+<table>
+  <thead>
+    <tr><th>Permission</th><th>Used for</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>POST_NOTIFICATIONS</code></td>
+      <td>Showing the daily training reminder and the streak-expiry warning —
+          only the ones you switch on. Declining simply means no reminders.</td>
+    </tr>
+    <tr>
+      <td><code>SCHEDULE_EXACT_ALARM</code>, <code>USE_EXACT_ALARM</code></td>
+      <td>Delivering the daily reminder at the exact time you chose.</td>
+    </tr>
+    <tr>
+      <td><code>RECEIVE_BOOT_COMPLETED</code></td>
+      <td>Re-scheduling your reminders after the phone restarts.</td>
+    </tr>
+    <tr>
+      <td><code>WAKE_LOCK</code></td>
+      <td>Keeping the screen on during an active workout so it does not sleep
+          mid-set. Can be turned off in Settings.</td>
+    </tr>
+    <tr>
+      <td>Proximity sensor <em>(optional hardware)</em></td>
+      <td>Counting reps when you enable proximity counting and rest the phone on
+          the floor. The sensor is read only while a workout screen is open, and
+          only in that mode. Nothing is recorded except the rep count. Phones
+          without the sensor use tap counting instead.</td>
+    </tr>
+    <tr>
+      <td><code>INTERNET</code> <em>(debug builds only)</em></td>
+      <td>Included automatically by the Flutter toolchain for development
+          tooling. The published release build does not request it, and the app
+          makes no network requests.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Sharing and exporting — your choice</h2>
+<p>
+  ExStreak includes an export feature that writes your training data to a CSV or
+  JSON file and hands it to Android's share sheet. This only happens when you
+  tap it, and you choose where the file goes. Once you share a file with another
+  app, that app's own privacy policy applies to it.
+</p>
+<p>
+  The "share your progress" button on the Profile screen composes a short text
+  summary (your streak, record and total reps) and passes it to the share sheet.
+  Again, nothing is sent anywhere until you pick a destination.
+</p>
+
+<h2>Deleting your data</h2>
+<p>
+  Because the data is local, you are always in control:
+</p>
+<ul>
+  <li><strong>Settings → Your data → Delete training data</strong> removes every
+      workout, streak, record, goal and badge, keeping your profile.</li>
+  <li><strong>Settings → Your data → Reset the app</strong> removes everything
+      and returns the app to first-run setup.</li>
+  <li>Uninstalling ExStreak deletes the database along with the app.</li>
+</ul>
+<p>
+  There is nothing for us to delete on our side, because we never receive
+  anything.
+</p>
+
+<h2>Children</h2>
+<p>
+  ExStreak is a general-audience fitness app and is not directed at children
+  under 13. It collects no personal information from anyone, including children.
+</p>
+
+<h2>Google Play</h2>
+<p>
+  ExStreak is distributed through Google Play. Google collects its own data
+  about installs and crashes under its own policies, independently of this app.
+  See <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.
+</p>
+<p>
+  If you have opted in to sending crash reports to Google Play, a crash may
+  include a stack trace of the app's code. These reports contain no training
+  data or profile information.
+</p>
+
+<h2>Changes to this policy</h2>
+<p>
+  If a future version of ExStreak collects or transmits anything, this page will
+  be updated before that version ships, and the change will be described in the
+  release notes.
+</p>
+
+<h2>Contact</h2>
+<p>
+  Questions about this policy or the app:
+  <a href="mailto:simonsvabenicky@gmail.com">simonsvabenicky@gmail.com</a>
+</p>
+
+<footer>
+  ExStreak · <a href="https://github.com/hhxgg/exstreak">Source code on GitHub</a>
+</footer>
+
+</main>
+</body>
+</html>

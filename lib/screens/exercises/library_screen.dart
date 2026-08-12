@@ -79,6 +79,12 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                           (f) => f.copyWith(favouritesOnly: !f.favouritesOnly),
                         ),
                   ),
+                  const SizedBox(width: Gap.sm),
+                  IconPill(
+                    icon: Icons.visibility_off_outlined,
+                    tooltip: 'Hidden exercises',
+                    onPressed: () => context.push(Routes.hiddenExercises),
+                  ),
                 ],
               ),
             ),

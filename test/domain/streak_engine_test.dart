@@ -54,11 +54,14 @@ void main() {
     });
 
     test('multiple workouts on one day still count as one day', () {
-      // The engine takes a set of days, so duplicates collapse by construction.
-      final s = StreakEngine.compute(
-        activeDays: {today, today, today.previous},
-        today: today,
-      );
+      // Three sessions logged, two of them today. Built by adding rather than
+      // as a literal so the duplicate is a real runtime collapse.
+      final active = <Day>{};
+      for (final d in [today, today, today.previous]) {
+        active.add(d);
+      }
+
+      final s = StreakEngine.compute(activeDays: active, today: today);
       expect(s.current, 2);
       expect(s.totalActiveDays, 2);
     });
@@ -138,11 +141,7 @@ void main() {
         qualifyingDays: qualifying,
         today: today,
       );
-      expect(missed, [
-        today.addDays(-3),
-        today.addDays(-2),
-        today.addDays(-1),
-      ]);
+      expect(missed, [today.addDays(-3), today.addDays(-2), today.addDays(-1)]);
     });
 
     test('missedDaysSince is empty when yesterday was active', () {

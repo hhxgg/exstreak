@@ -179,11 +179,6 @@ class WorkoutRepository {
     );
   }
 
-  Future<void> setTargetValue(int setId, int target) => _db.updateSet(
-    setId,
-    WorkoutSetsCompanion(targetValue: Value(math.max(0, target))),
-  );
-
   /// Appends an extra set to an exercise mid-session.
   Future<void> addSet(
     int workoutExerciseId, {
@@ -201,8 +196,6 @@ class WorkoutRepository {
       ),
     );
   }
-
-  Future<void> removeSet(int setId) => _db.deleteSet(setId);
 
   Future<void> skipExercise(int workoutExerciseId, {bool skipped = true}) =>
       _db.updateWorkoutExercise(
@@ -231,8 +224,7 @@ class WorkoutRepository {
     final streakBefore = (await computeStreak()).current;
     // Only sessions with real work count, so an earlier abandoned session
     // does not make this one look like a bonus.
-    final priorWorkoutsToday =
-        (await _db.qualifyingWorkoutsOnDay(day)).length;
+    final priorWorkoutsToday = (await _db.qualifyingWorkoutsOnDay(day)).length;
 
     final pairs = await _db.setsForWorkout(workoutId);
     final catalogue = {

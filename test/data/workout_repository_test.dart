@@ -57,7 +57,9 @@ void main() {
     int reps = 10,
     SessionFeedback? feedback,
   }) async {
-    final id = await repo.createWorkout(await repsDraft(ex: ex, targets: targets));
+    final id = await repo.createWorkout(
+      await repsDraft(ex: ex, targets: targets),
+    );
     final active = await repo.loadActive(id);
     for (final set in active!.exercises.single.sets) {
       await repo.completeSet(setId: set.id, reps: reps);
@@ -112,10 +114,11 @@ void main() {
       expect(active!.exercises, hasLength(1));
       expect(active.totalSets, 3);
       expect(active.completedSets, 0);
-      expect(
-        active.exercises.single.sets.map((s) => s.target).toList(),
-        [12, 10, 8],
-      );
+      expect(active.exercises.single.sets.map((s) => s.target).toList(), [
+        12,
+        10,
+        8,
+      ]);
     });
 
     test('a fresh session is not yet in history', () async {
@@ -128,7 +131,10 @@ void main() {
       final pushup = await exercise('pushup');
       final id = await repo.createWorkout(await repsDraft(ex: pushup));
       final active = await repo.loadActive(id);
-      await repo.completeSet(setId: active!.exercises.single.sets.first.id, reps: 11);
+      await repo.completeSet(
+        setId: active!.exercises.single.sets.first.id,
+        reps: 11,
+      );
 
       // Re-reading from the database, as a cold start would.
       final reloaded = await repo.loadActive(id);
@@ -507,26 +513,29 @@ void main() {
       expect(all.firstWhere((e) => e.id == pushup.id).isArchived, isTrue);
     });
 
-    test('a custom exercise used by history is archived, not deleted', () async {
-      final id = await db.insertExercise(
-        ExercisesCompanion.insert(
-          name: 'Archer push-ups',
-          muscleGroup: MuscleGroup.chest,
-          equipment: Equipment.none,
-          difficulty: Difficulty.advanced,
-          trackingType: TrackingType.reps,
-          isCustom: const Value(true),
-        ),
-      );
-      final custom = (await db.exerciseById(id))!;
-      await runSession(ex: custom, targets: [5], reps: 5);
+    test(
+      'a custom exercise used by history is archived, not deleted',
+      () async {
+        final id = await db.insertExercise(
+          ExercisesCompanion.insert(
+            name: 'Archer push-ups',
+            muscleGroup: MuscleGroup.chest,
+            equipment: Equipment.none,
+            difficulty: Difficulty.advanced,
+            trackingType: TrackingType.reps,
+            isCustom: const Value(true),
+          ),
+        );
+        final custom = (await db.exerciseById(id))!;
+        await runSession(ex: custom, targets: [5], reps: 5);
 
-      await db.removeExercise(id);
-      final all = await db.getExercises(includeArchived: true);
-      expect(all.firstWhere((e) => e.id == id).isArchived, isTrue);
-      // History survives.
-      expect(await db.completedWorkouts(), hasLength(1));
-    });
+        await db.removeExercise(id);
+        final all = await db.getExercises(includeArchived: true);
+        expect(all.firstWhere((e) => e.id == id).isArchived, isTrue);
+        // History survives.
+        expect(await db.completedWorkouts(), hasLength(1));
+      },
+    );
 
     test('an unused custom exercise is deleted outright', () async {
       final id = await db.insertExercise(

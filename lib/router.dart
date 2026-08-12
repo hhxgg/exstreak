@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'screens/exercises/exercise_detail_screen.dart';
 import 'screens/exercises/exercise_editor_screen.dart';
+import 'screens/exercises/hidden_exercises_screen.dart';
 import 'screens/exercises/library_screen.dart';
 import 'screens/goals/goal_editor_screen.dart';
 import 'screens/goals/goals_screen.dart';
@@ -45,6 +46,7 @@ abstract final class Routes {
   static String workoutSummary(int id) => '/workout/summary/$id';
   static String exercise(int id) => '/exercise/$id';
   static const String newExercise = '/exercise/new';
+  static const String hiddenExercises = '/exercise/hidden';
   static String editExercise(int id) => '/exercise/$id/edit';
   static String exerciseProgress(int id) => '/progress/exercise/$id';
   static String workoutDetail(int id) => '/history/$id';
@@ -164,6 +166,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.newExercise,
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const ExerciseEditorScreen(),
+      ),
+      // Declared before '/exercise/:id' so "hidden" is not read as an id.
+      GoRoute(
+        path: Routes.hiddenExercises,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const HiddenExercisesScreen(),
       ),
       GoRoute(
         path: '/exercise/:id/edit',

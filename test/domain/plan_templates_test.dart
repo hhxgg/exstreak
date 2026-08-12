@@ -66,7 +66,8 @@ void main() {
           expect(
             template.totalFor(level, 1),
             greaterThan(template.totalFor(level - 1, 1)),
-            reason: '${template.id} level $level should start above level '
+            reason:
+                '${template.id} level $level should start above level '
                 '${level - 1}',
           );
         }

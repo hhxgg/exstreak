@@ -52,9 +52,18 @@ void main() {
     });
 
     test('equality and hashing work in sets and maps', () {
-      final set = {const Day(2026, 8, 12), const Day(2026, 8, 12)};
+      // Built from separate instances so this exercises hashCode/== rather
+      // than a compile-time constant literal being folded.
+      final set = <Day>{}
+        ..add(Day.fromDateTime(DateTime(2026, 8, 12)))
+        ..add(Day.fromEpochKey(20260812))
+        ..add(const Day(2026, 8, 12));
       expect(set.length, 1);
-      expect(set.contains(Day.fromEpochKey(20260812)), isTrue);
+
+      final map = <Day, String>{const Day(2026, 8, 12): 'first'};
+      map[Day.fromEpochKey(20260812)] = 'second';
+      expect(map.length, 1);
+      expect(map.values.single, 'second');
     });
   });
 

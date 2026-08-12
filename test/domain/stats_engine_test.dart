@@ -24,10 +24,9 @@ void main() {
 
   group('trend', () {
     test('one bar per day for short windows', () {
-      final dense = StatsEngine.densify(
-        [ActivityPoint(day: today, reps: 10, workoutCount: 1)],
-        DayRange.lastDays(7, endingOn: today),
-      );
+      final dense = StatsEngine.densify([
+        ActivityPoint(day: today, reps: 10, workoutCount: 1),
+      ], DayRange.lastDays(7, endingOn: today));
       final series = StatsEngine.trend(
         dense,
         StatsWindow.week,
@@ -39,11 +38,7 @@ void main() {
     test('buckets longer windows and sums within each bucket', () {
       final dense = [
         for (var i = 0; i < 14; i++)
-          ActivityPoint(
-            day: today.addDays(-13 + i),
-            reps: 10,
-            workoutCount: 1,
-          ),
+          ActivityPoint(day: today.addDays(-13 + i), reps: 10, workoutCount: 1),
       ];
       final series = StatsEngine.trend(
         dense,
@@ -56,7 +51,11 @@ void main() {
 
     test('handles an empty input', () {
       expect(
-        StatsEngine.trend(const [], StatsWindow.month, (p) => p.reps.toDouble()),
+        StatsEngine.trend(
+          const [],
+          StatsWindow.month,
+          (p) => p.reps.toDouble(),
+        ),
         isEmpty,
       );
     });
@@ -169,13 +168,10 @@ void main() {
 
   group('totals', () {
     test('averages over active days only, not rest days', () {
-      final activity = StatsEngine.densify(
-        [
-          ActivityPoint(day: today, workoutCount: 1, reps: 40),
-          ActivityPoint(day: today.addDays(-6), workoutCount: 1, reps: 20),
-        ],
-        DayRange.lastDays(7, endingOn: today),
-      );
+      final activity = StatsEngine.densify([
+        ActivityPoint(day: today, workoutCount: 1, reps: 40),
+        ActivityPoint(day: today.addDays(-6), workoutCount: 1, reps: 20),
+      ], DayRange.lastDays(7, endingOn: today));
 
       final totals = StatsEngine.totals(activity: activity);
       expect(totals.totalReps, 60);

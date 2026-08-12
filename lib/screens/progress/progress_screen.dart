@@ -301,7 +301,104 @@ class _OverviewTab extends ConsumerWidget {
         ),
         const SizedBox(height: Gap.xxl),
 
+        const _WeekdaySection(),
+        const SizedBox(height: Gap.xxl),
+
         const _RecordsSection(),
+      ],
+    );
+  }
+}
+
+/// Which days of the week the user actually trains on.
+///
+/// Useful precisely because it is often not the days people think.
+class _WeekdaySection extends ConsumerWidget {
+  const _WeekdaySection();
+
+  static const List<String> _labels = [
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun',
+  ];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.colors;
+    final dist = ref.watch(weekdayDistributionProvider).valueOrNull;
+    if (dist == null) return const SizedBox.shrink();
+
+    final max = dist.values.fold<int>(0, (a, b) => b > a ? b : a);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader(title: 'Training days'),
+        AppCard(
+          child: max == 0
+              ? EmptyState(
+                  icon: Icons.calendar_view_week_rounded,
+                  title: 'No pattern yet',
+                  message: 'A few sessions and your rhythm shows up here.',
+                  compact: true,
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (var day = 1; day <= 7; day++)
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: Gap.xs,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '${dist[day] ?? 0}',
+                                style: AppTypography.caption.copyWith(
+                                  color: c.textSecondary,
+                                  fontFeatures: AppTypography.tabular,
+                                ),
+                              ),
+                              const SizedBox(height: Gap.xs),
+                              TweenAnimationBuilder<double>(
+                                tween: Tween(
+                                  begin: 0,
+                                  end: (dist[day] ?? 0) / max,
+                                ),
+                                duration: Motion.normal,
+                                curve: Motion.emphasized,
+                                builder: (context, v, _) => Container(
+                                  height: 8 + v * 62,
+                                  decoration: BoxDecoration(
+                                    gradient: v > 0
+                                        ? c.brandGradientVertical
+                                        : null,
+                                    color: v > 0 ? null : c.surfaceSunken,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: Gap.sm),
+                              Text(
+                                _labels[day - 1],
+                                style: AppTypography.caption.copyWith(
+                                  color: c.textTertiary,
+                                  fontSize: 10.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+        ),
       ],
     );
   }

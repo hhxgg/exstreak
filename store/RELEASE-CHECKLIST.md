@@ -122,31 +122,37 @@ Copy from `store/listing.md`:
 
 ### Screenshots
 
-**Not yet captured.** Taking them needs a running instance of the app, and this
-machine cannot run an Android emulator — CPU virtualisation is disabled in the
-firmware (`VirtualizationFirmwareEnabled: False`) and no hypervisor is
-installed. Both fixes need BIOS access and administrator rights.
+**Done.** Eight are ready in `store/graphics/screenshots/`, captured from a
+physical device (Huawei LYA-L29, Android 10) running the signed release build:
 
-Two ways to get them:
+| File | Screen |
+| --- | --- |
+| `01-home.png` | Home dashboard — streak, next plan day |
+| `02-live-set.png` | Live set, rep ring at target |
+| `03-rest-timer.png` | Rest countdown between sets |
+| `04-adaptive-plan.png` | "How did that feel?" — the adaptive prompt |
+| `05-summary.png` | Session summary |
+| `06-streaks.png` | Streak card, protection and consistency |
+| `07-calendar.png` | Training calendar |
+| `08-library.png` | Exercise library |
 
-- **Plug in your Android phone** with USB debugging enabled. Then:
-  ```bash
-  flutter install --release
-  ```
-  Take screenshots on the device, or capture them over ADB:
-  ```bash
-  adb exec-out screencap -p > store/graphics/screenshots/01-home.png
-  ```
-  Ask me to drive this and I will install the app and script the capture.
+Each is **1080×1920** (9:16), 24-bit PNG with no alpha. That satisfies Play's
+hard limit of at most 2:1 and also the 9:16 / ≥1080px short side that Play wants
+for an app to be eligible for promotional placement.
 
-- **Enable virtualisation**: reboot into BIOS/UEFI, turn on Intel VT-x or
-  AMD-V, then run Android Studio's SDK Manager as administrator and install the
-  *Android Emulator hypervisor driver*. The AVD `exstreak_test` is already
-  created and waiting.
+To re-capture after UI changes, take raw device grabs into
+`store/graphics/screenshots/raw/`, copy the ones you want into `…/src/` with
+ordered names, then run:
 
-Screens worth capturing: Home dashboard, an active set with the rep ring, the
-"How did that feel?" prompt, the streak calendar, the Progress charts, and the
-badge case on Profile.
+```bash
+pwsh ./tool/make_play_screenshots.ps1
+```
+
+That crops the device status and navigation bars — they show the tester's
+battery level and unrelated notification icons, which do not belong in a store
+listing — and letterboxes the result onto a 1080×1920 canvas in the app's own
+background colour, so nothing of the app is cropped. `raw/` and `src/` are
+git-ignored; only the finished images are tracked.
 
 ---
 

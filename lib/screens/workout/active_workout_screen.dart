@@ -515,13 +515,13 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
                 canComplete: _trackingType.tracksReps
                     ? _reps > 0
                     : _heldSeconds > 0,
-                isLastSet: exercise.nextSetIndex == exercise.sets.length - 1,
                 finishing: _finishing,
                 weightKg: _weightKg,
                 unitSystem: ref.watch(unitSystemProvider),
                 onWeightChanged: (v) => setState(() => _weightKg = v),
                 onCompleteSet: _completeSet,
                 onSkipExercise: _skipExercise,
+                onSkipRest: _skipRest,
                 onAddSet: _addAnotherSet,
                 onFinish: _finishEarly,
               ),
@@ -823,13 +823,6 @@ class _RestView extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: Gap.xxl),
-          SecondaryButton(
-            label: 'Skip rest',
-            icon: Icons.fast_forward_rounded,
-            expanded: false,
-            onPressed: onSkip,
-          ),
         ],
       ),
     );
@@ -841,13 +834,13 @@ class _Controls extends StatelessWidget {
     required this.phase,
     required this.trackingType,
     required this.canComplete,
-    required this.isLastSet,
     required this.finishing,
     required this.weightKg,
     required this.unitSystem,
     required this.onWeightChanged,
     required this.onCompleteSet,
     required this.onSkipExercise,
+    required this.onSkipRest,
     required this.onAddSet,
     required this.onFinish,
   });
@@ -855,13 +848,13 @@ class _Controls extends StatelessWidget {
   final _Phase phase;
   final TrackingType trackingType;
   final bool canComplete;
-  final bool isLastSet;
   final bool finishing;
   final double weightKg;
   final UnitSystem unitSystem;
   final ValueChanged<double> onWeightChanged;
   final VoidCallback onCompleteSet;
   final VoidCallback onSkipExercise;
+  final VoidCallback onSkipRest;
   final VoidCallback onAddSet;
   final VoidCallback onFinish;
 
@@ -898,11 +891,18 @@ class _Controls extends StatelessWidget {
               const SizedBox(width: Gap.md),
               Expanded(
                 flex: 2,
+                // Rest is only ever entered when sets remain — finishing the
+                // whole workout auto-completes instead. Putting "Finish
+                // workout" here therefore offered to end the session early,
+                // in the exact spot the user had just tapped "Done". Skipping
+                // the rest is the action they actually want next; "End & save"
+                // below still stops the session deliberately.
                 child: phase == _Phase.resting
                     ? PrimaryButton(
-                        label: 'Finish workout',
+                        label: 'Skip rest',
+                        gradient: true,
                         loading: finishing,
-                        onPressed: finishing ? null : onFinish,
+                        onPressed: finishing ? null : onSkipRest,
                       )
                     : PrimaryButton(
                         label: 'Done',

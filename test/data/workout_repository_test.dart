@@ -555,14 +555,58 @@ void main() {
   });
 
   group('abandoned sessions', () {
-    test('an empty unfinished session is purged', () async {
+    test('older empty sessions are purged', () async {
       final pushup = await exercise('pushup');
-      await repo.createWorkout(await repsDraft(ex: pushup));
+      final first = await repo.createWorkout(await repsDraft(ex: pushup));
+      final second = await repo.createWorkout(await repsDraft(ex: pushup));
 
-      final removed = await db.purgeEmptyUnfinishedWorkouts();
-      expect(removed, 1);
-      expect(await db.latestUnfinishedWorkout(), isNull);
+      // Make the ordering unambiguous rather than relying on clock resolution.
+      await db.updateWorkout(
+        first,
+        WorkoutsCompanion(
+          startedAt: Value(DateTime.now().subtract(const Duration(hours: 2))),
+        ),
+      );
+
+      expect(await db.purgeEmptyUnfinishedWorkouts(), 1);
+      expect((await db.latestUnfinishedWorkout())?.id, second);
     });
+
+    test('the newest empty session survives a purge', () async {
+      // Regression: the purge used to delete every unfinished session with no
+      // completed sets — which is exactly what a session looks like the moment
+      // the user starts it. On device this emptied the live workout.
+      final pushup = await exercise('pushup');
+      final id = await repo.createWorkout(await repsDraft(ex: pushup));
+
+      expect(await db.purgeEmptyUnfinishedWorkouts(), 0);
+      expect((await db.latestUnfinishedWorkout())?.id, id);
+    });
+
+    test(
+      'a just-started session keeps its sets when the resume slot is read',
+      () async {
+        // Reproduces the device failure end to end: `_launch` creates the
+        // workout, then invalidates the resume provider, which re-reads
+        // `resumableWorkout()` while the session screen is loading the same rows.
+        final pushup = await exercise('pushup');
+        final id = await repo.createWorkout(
+          await repsDraft(ex: pushup, targets: [6, 9, 7, 5, 5]),
+        );
+
+        await repo.resumableWorkout();
+
+        final active = await repo.loadActive(id);
+        expect(active, isNotNull, reason: 'the session must still exist');
+        expect(active!.exercises.single.sets.map((s) => s.target).toList(), [
+          6,
+          9,
+          7,
+          5,
+          5,
+        ]);
+      },
+    );
 
     test('a partially completed session is kept and resumable', () async {
       final pushup = await exercise('pushup');

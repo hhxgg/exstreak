@@ -120,8 +120,12 @@ class WorkoutRepository {
 
   /// Returns an unfinished session worth resuming, re-dating it to today if it
   /// was started on a previous day.
+  ///
+  /// Deliberately does not delete anything. This runs from a provider that is
+  /// invalidated after every write, so a destructive step here would race the
+  /// screen that is reading the same rows. Cleanup happens on foreground
+  /// transitions instead — see [AppDatabase.purgeEmptyUnfinishedWorkouts].
   Future<ActiveWorkout?> resumableWorkout() async {
-    await _db.purgeEmptyUnfinishedWorkouts();
     final row = await _db.latestUnfinishedWorkout();
     if (row == null) return null;
 

@@ -36,6 +36,7 @@ pubspec.lock.bak
 # Android
 # ---------------------------------------------------------------------------
 android/.gradle/
+android/.kotlin/
 android/captures/
 android/local.properties
 android/.cxx/
@@ -71,3 +72,9 @@ release/
 *.aab.idsig
 *.apks
 coverage/
+
+# Intermediate screenshot capture. Only the finished Play-ready images in
+# store/graphics/screenshots/ are tracked; these two folders are the unedited
+# device captures and the staging copies used to produce them.
+store/graphics/screenshots/raw/
+store/graphics/screenshots/src/

@@ -211,6 +211,11 @@ void main() {
       expect(find.text('Set complete'), findsOneWidget);
       expect(find.text('REST'), findsOneWidget);
       expect(find.text('Skip rest'), findsOneWidget);
+
+      // Regression: the primary slot used to read "Finish workout" during
+      // rest, which ends the session — sitting exactly where the user had
+      // just tapped "Done", one set into five.
+      expect(find.text('Finish workout'), findsNothing);
     });
 
     testWidgets('skipping rest returns to counting on the next set', (

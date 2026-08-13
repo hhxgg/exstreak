@@ -265,13 +265,29 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Removes sessions that were started and abandoned without a single
-  /// completed set, so the history list is not polluted by mis-taps.
+  /// completed set, so stale sessions do not pile up or get offered for resume.
+  ///
+  /// The newest unfinished session is always spared. A session the user just
+  /// started has no completed sets *by definition*, so without this guard the
+  /// purge would delete the workout that is open on screen — emptying it out
+  /// from under the UI mid-session. Only older empties are truly abandoned.
   Future<int> purgeEmptyUnfinishedWorkouts() async {
-    final stale = await (select(
-      workouts,
-    )..where((t) => t.isCompleted.equals(false))).get();
+    final stale =
+        await (select(workouts)
+              ..where((t) => t.isCompleted.equals(false))
+              // Same ordering as [latestUnfinishedWorkout], so the row spared
+              // here is exactly the one that would be offered for resume.
+              ..orderBy([
+                (t) => OrderingTerm(
+                  expression: t.startedAt,
+                  mode: OrderingMode.desc,
+                ),
+                (t) => OrderingTerm(expression: t.id, mode: OrderingMode.desc),
+              ]))
+            .get();
+
     var removed = 0;
-    for (final w in stale) {
+    for (final w in stale.skip(1)) {
       final done = await _completedSetCount(w.id);
       if (done == 0) {
         await deleteWorkout(w.id);

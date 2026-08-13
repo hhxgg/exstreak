@@ -201,38 +201,44 @@ class _StreakRow extends ConsumerWidget {
               horizontal: Gap.lg,
               vertical: Gap.lg,
             ),
-            child: Row(
+            // Stacked rather than side-by-side so the status line gets the
+            // full card width. Beside the flame it had barely 100dp and
+            // "Start your streak" was truncated on a 360dp-wide phone.
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                StreakFlame(days: current, size: 34),
-                const SizedBox(width: Gap.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
+                Row(
+                  children: [
+                    StreakFlame(days: current, size: 30),
+                    const SizedBox(width: Gap.sm),
+                    Flexible(
+                      child: Text(
                         current == 1 ? 'day' : 'days',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: AppTypography.bodySmall.copyWith(
                           color: c.textSecondary,
                         ),
                       ),
-                      Text(
-                        streak == null
-                            ? '—'
-                            : streak.trainedToday
-                            ? 'Done today'
-                            : current > 0
-                            ? 'Keep it alive'
-                            : 'Start your streak',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.caption.copyWith(
-                          color: streak?.trainedToday ?? false
-                              ? c.success
-                              : c.textTertiary,
-                        ),
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  streak == null
+                      ? '—'
+                      : streak.trainedToday
+                      ? 'Done today'
+                      : current > 0
+                      ? 'Keep it alive'
+                      : 'Start your streak',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.caption.copyWith(
+                    color: streak?.trainedToday ?? false
+                        ? c.success
+                        : c.textTertiary,
                   ),
                 ),
               ],

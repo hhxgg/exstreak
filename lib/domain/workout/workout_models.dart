@@ -230,7 +230,10 @@ class ActiveWorkout {
   final int? planLevel;
   final int? planDay;
 
-  bool get isEmpty => exercises.isEmpty;
+  /// True when there is nothing to perform. An exercise carrying no sets is
+  /// as unusable as no exercise at all, so the session screen shows its
+  /// "no longer available" state instead of an inert counter.
+  bool get isEmpty => exercises.isEmpty || totalSets == 0;
 
   int get totalSets => exercises.fold(0, (a, e) => a + e.sets.length);
 

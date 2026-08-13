@@ -54,6 +54,12 @@ class _ExStreakAppState extends ConsumerState<ExStreakApp>
 
     final workouts = ref.read(workoutRepositoryProvider);
 
+    // 0. Drop sessions abandoned before the current one. Safe here because
+    //    the purge always spares the newest session, which is the one the
+    //    user may still be in the middle of.
+    await ref.read(databaseProvider).purgeEmptyUnfinishedWorkouts();
+    if (!mounted) return;
+
     // 1. Spend freezes on any gap since the last qualifying day.
     if (settings.freezesAvailable > 0) {
       final spent = await workouts.applyFreezes(

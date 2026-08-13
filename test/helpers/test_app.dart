@@ -8,7 +8,9 @@ import 'package:exstreak/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wakelock_plus_platform_interface/wakelock_plus_platform_interface.dart';
 
 /// Notification service that never touches a platform channel.
 ///
@@ -54,6 +56,25 @@ class FakeNotificationService extends NotificationService {
 
   @override
   Future<void> cancelAll() async {}
+}
+
+/// Keeps `WakelockPlus.enable()` from reaching a platform channel that does
+/// not exist in a widget test.
+class FakeWakelock extends WakelockPlusPlatformInterface {
+  bool isEnabled = false;
+
+  @override
+  Future<void> toggle({required bool enable}) async {
+    isEnabled = enable;
+  }
+
+  @override
+  Future<bool> get enabled async => isEnabled;
+}
+
+/// Installs the stub. Safe to call from every test's setUp.
+void installFakeWakelock() {
+  WakelockPlusPlatformInterface.instance = FakeWakelock();
 }
 
 /// A ready-to-use test environment: in-memory database, seeded catalogue and
@@ -103,6 +124,22 @@ class TestEnv {
         darkTheme: AppTheme.dark(),
         themeMode: ThemeMode.dark,
         home: child,
+      ),
+    );
+  }
+
+  /// Wraps [routes] in a real GoRouter, for screens that navigate.
+  ///
+  /// The workout screen finishes with `context.pushReplacement`, which only
+  /// exists on a GoRouter context — a plain Navigator would throw.
+  Widget wrapRouted(List<RouteBase> routes, {String initial = '/'}) {
+    return UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp.router(
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
+        themeMode: ThemeMode.dark,
+        routerConfig: GoRouter(initialLocation: initial, routes: routes),
       ),
     );
   }

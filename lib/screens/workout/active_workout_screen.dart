@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -357,10 +358,24 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
     );
   }
 
+  /// Leaves the session screen.
+  ///
+  /// The screen is normally pushed on top of the shell, but it is also
+  /// reachable directly (deep link, or as the first route in a test), where
+  /// there is nothing to pop — fall back to home rather than throwing.
+  void _leave() {
+    if (!mounted) return;
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(Routes.home);
+    }
+  }
+
   Future<void> _cancel({bool confirm = true}) async {
     final workout = _workout;
     if (workout == null) {
-      if (mounted) context.pop();
+      _leave();
       return;
     }
 
@@ -395,7 +410,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
     await WakelockPlus.disable();
     if (!mounted) return;
     ref.invalidate(resumableWorkoutProvider);
-    context.pop();
+    _leave();
   }
 
   /// Ends early but keeps what was already completed.
@@ -612,109 +627,122 @@ class _CounterView extends StatelessWidget {
     final progress = isOpenEnded ? 1.0 : value / target;
     final reached = !isOpenEnded && value >= target;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (reached)
-          Container(
-            margin: const EdgeInsets.only(bottom: Gap.xl),
-            padding: const EdgeInsets.symmetric(
-              horizontal: Gap.lg,
-              vertical: Gap.sm,
-            ),
-            decoration: BoxDecoration(
-              color: c.warningSoft,
-              borderRadius: Radii.pillRadius,
-              border: Border.all(color: c.warning.withValues(alpha: 0.5)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.bolt_rounded, size: 16, color: c.warning),
-                const SizedBox(width: Gap.sm),
-                Text(
-                  'Target hit — squeeze out more',
-                  style: AppTypography.caption.copyWith(color: c.warning),
-                ),
-              ],
-            ),
-          ),
-        GestureDetector(
-          onTap: isDuration ? onToggleHold : onTapCount,
-          onLongPress: isDuration ? null : onRemove,
-          behavior: HitTestBehavior.opaque,
-          child: ProgressRing(
-            progress: progress,
-            size: 268,
-            strokeWidth: 18,
-            semanticsLabel: isDuration ? 'Hold timer' : 'Rep counter',
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Column(
+    // The ring is the biggest thing on screen, so it has to yield on short
+    // displays — a fixed size overflows in landscape and on small phones.
+    final available = MediaQuery.sizeOf(context);
+    final ringSize = math
+        .min(available.width - Gap.screenH * 2, available.height * 0.42)
+        .clamp(180.0, 268.0);
+
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (reached)
+            Container(
+              margin: const EdgeInsets.only(bottom: Gap.xl),
+              padding: const EdgeInsets.symmetric(
+                horizontal: Gap.lg,
+                vertical: Gap.sm,
+              ),
+              decoration: BoxDecoration(
+                color: c.warningSoft,
+                borderRadius: Radii.pillRadius,
+                border: Border.all(color: c.warning.withValues(alpha: 0.5)),
+              ),
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  GradientText(
-                    isDuration ? Fmt.clock(heldSeconds) : '$value',
-                    style: AppTypography.displayXL.copyWith(
-                      fontSize: isDuration ? 72 : 96,
-                    ),
-                  ),
-                  const SizedBox(height: Gap.xs),
+                  Icon(Icons.bolt_rounded, size: 16, color: c.warning),
+                  const SizedBox(width: Gap.sm),
                   Text(
-                    isDuration ? 'HOLD' : 'REPS',
-                    style: AppTypography.overline.copyWith(
-                      color: c.textTertiary,
-                    ),
-                  ),
-                  const SizedBox(height: Gap.sm),
-                  Text(
-                    isOpenEnded
-                        ? 'No limit'
-                        : 'Target ${isDuration ? Fmt.duration(target) : target}',
-                    style: AppTypography.titleS.copyWith(color: c.textPrimary),
+                    'Target hit — squeeze out more',
+                    style: AppTypography.caption.copyWith(color: c.warning),
                   ),
                 ],
               ),
             ),
-          ),
-        ),
-        const SizedBox(height: Gap.xxl),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isDuration
-                  ? (holdRunning
-                        ? Icons.pause_circle_outline
-                        : Icons.play_circle_outline)
-                  : inputMode == RepInputMode.proximity
-                  ? Icons.sensors_rounded
-                  : Icons.touch_app_outlined,
-              size: 16,
-              color: c.textTertiary,
-            ),
-            const SizedBox(width: Gap.sm),
-            Flexible(
-              child: Text(
-                isDuration
-                    ? (holdRunning
-                          ? 'Tap the ring to pause'
-                          : 'Tap the ring to start')
-                    : inputMode.hint,
-                textAlign: TextAlign.center,
-                style: AppTypography.bodySmall.copyWith(color: c.textTertiary),
+          GestureDetector(
+            onTap: isDuration ? onToggleHold : onTapCount,
+            onLongPress: isDuration ? null : onRemove,
+            behavior: HitTestBehavior.opaque,
+            child: ProgressRing(
+              progress: progress,
+              size: ringSize,
+              strokeWidth: 18,
+              semanticsLabel: isDuration ? 'Hold timer' : 'Rep counter',
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GradientText(
+                      isDuration ? Fmt.clock(heldSeconds) : '$value',
+                      style: AppTypography.displayXL.copyWith(
+                        fontSize: isDuration ? 72 : 96,
+                      ),
+                    ),
+                    const SizedBox(height: Gap.xs),
+                    Text(
+                      isDuration ? 'HOLD' : 'REPS',
+                      style: AppTypography.overline.copyWith(
+                        color: c.textTertiary,
+                      ),
+                    ),
+                    const SizedBox(height: Gap.sm),
+                    Text(
+                      isOpenEnded
+                          ? 'No limit'
+                          : 'Target ${isDuration ? Fmt.duration(target) : target}',
+                      style: AppTypography.titleS.copyWith(
+                        color: c.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
-        if (!isDuration && reps > 0) ...[
-          const SizedBox(height: Gap.sm),
-          Text(
-            'Long-press the ring to undo a rep',
-            style: AppTypography.caption.copyWith(color: c.textTertiary),
           ),
+          const SizedBox(height: Gap.xxl),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isDuration
+                    ? (holdRunning
+                          ? Icons.pause_circle_outline
+                          : Icons.play_circle_outline)
+                    : inputMode == RepInputMode.proximity
+                    ? Icons.sensors_rounded
+                    : Icons.touch_app_outlined,
+                size: 16,
+                color: c.textTertiary,
+              ),
+              const SizedBox(width: Gap.sm),
+              Flexible(
+                child: Text(
+                  isDuration
+                      ? (holdRunning
+                            ? 'Tap the ring to pause'
+                            : 'Tap the ring to start')
+                      : inputMode.hint,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: c.textTertiary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (!isDuration && reps > 0) ...[
+            const SizedBox(height: Gap.sm),
+            Text(
+              'Long-press the ring to undo a rep',
+              style: AppTypography.caption.copyWith(color: c.textTertiary),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -733,68 +761,77 @@ class _RestView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          margin: const EdgeInsets.only(bottom: Gap.xl),
-          padding: const EdgeInsets.symmetric(
-            horizontal: Gap.lg,
-            vertical: Gap.sm,
-          ),
-          decoration: BoxDecoration(
-            color: c.successSoft,
-            borderRadius: Radii.pillRadius,
-            border: Border.all(color: c.success.withValues(alpha: 0.5)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.check_rounded, size: 16, color: c.success),
-              const SizedBox(width: Gap.sm),
-              Text(
-                'Set complete',
-                style: AppTypography.caption.copyWith(color: c.success),
-              ),
-            ],
-          ),
-        ),
-        ProgressRing(
-          progress: total == 0 ? 0 : remaining / total,
-          size: 268,
-          strokeWidth: 18,
-          useGradient: false,
-          color: c.success,
-          semanticsLabel: 'Rest timer',
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Column(
+    final available = MediaQuery.sizeOf(context);
+    final ringSize = math
+        .min(available.width - Gap.screenH * 2, available.height * 0.42)
+        .clamp(180.0, 268.0);
+
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(bottom: Gap.xl),
+            padding: const EdgeInsets.symmetric(
+              horizontal: Gap.lg,
+              vertical: Gap.sm,
+            ),
+            decoration: BoxDecoration(
+              color: c.successSoft,
+              borderRadius: Radii.pillRadius,
+              border: Border.all(color: c.success.withValues(alpha: 0.5)),
+            ),
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Icon(Icons.check_rounded, size: 16, color: c.success),
+                const SizedBox(width: Gap.sm),
                 Text(
-                  Fmt.clock(remaining),
-                  style: AppTypography.displayL.copyWith(
-                    color: c.success,
-                    fontFeatures: AppTypography.tabular,
-                  ),
-                ),
-                const SizedBox(height: Gap.xs),
-                Text(
-                  'REST',
-                  style: AppTypography.overline.copyWith(color: c.textTertiary),
+                  'Set complete',
+                  style: AppTypography.caption.copyWith(color: c.success),
                 ),
               ],
             ),
           ),
-        ),
-        const SizedBox(height: Gap.xxl),
-        SecondaryButton(
-          label: 'Skip rest',
-          icon: Icons.fast_forward_rounded,
-          expanded: false,
-          onPressed: onSkip,
-        ),
-      ],
+          ProgressRing(
+            progress: total == 0 ? 0 : remaining / total,
+            size: ringSize,
+            strokeWidth: 18,
+            useGradient: false,
+            color: c.success,
+            semanticsLabel: 'Rest timer',
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    Fmt.clock(remaining),
+                    style: AppTypography.displayL.copyWith(
+                      color: c.success,
+                      fontFeatures: AppTypography.tabular,
+                    ),
+                  ),
+                  const SizedBox(height: Gap.xs),
+                  Text(
+                    'REST',
+                    style: AppTypography.overline.copyWith(
+                      color: c.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: Gap.xxl),
+          SecondaryButton(
+            label: 'Skip rest',
+            icon: Icons.fast_forward_rounded,
+            expanded: false,
+            onPressed: onSkip,
+          ),
+        ],
+      ),
     );
   }
 }

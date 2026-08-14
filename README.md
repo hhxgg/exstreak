@@ -175,7 +175,6 @@ All training data lives in a SQLite database on the device.
 | Permission | Used for |
 |---|---|
 | `POST_NOTIFICATIONS` | Only the reminders you switch on. |
-| `SCHEDULE_EXACT_ALARM` / `USE_EXACT_ALARM` | Firing the daily reminder at the time you picked. |
 | `RECEIVE_BOOT_COMPLETED` | Re-scheduling reminders after a reboot. |
 | `WAKE_LOCK` | Keeping the screen on during an active workout. |
 | Proximity sensor | Read only while a workout is open, and only if you choose proximity rep counting. Optional hardware — the app works without it. |

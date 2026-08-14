@@ -5,9 +5,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <!-- Keep the screen awake during an active workout / rest timer. -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <!-- Fire the daily reminder at the exact time the user picked. -->
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
 
     <!-- Proximity-sensor rep counting is optional: the app falls back to

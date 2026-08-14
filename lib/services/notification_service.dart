@@ -11,8 +11,14 @@ import '../core/branding.dart';
 /// Local reminder notifications.
 ///
 /// Everything here is best-effort: reminders are a nicety, so a device that
-/// denies the permission, lacks exact-alarm rights or has an unusual timezone
-/// database must degrade quietly rather than break the app.
+/// denies the permission or has an unusual timezone database must degrade
+/// quietly rather than break the app.
+///
+/// Scheduling always uses [AndroidScheduleMode.inexactAllowWhileIdle]. Exact
+/// alarms need `SCHEDULE_EXACT_ALARM` / `USE_EXACT_ALARM`, and Play Console
+/// restricts the latter to apps whose core function is an alarm clock or
+/// calendar — a training reminder does not qualify, and does not need
+/// to-the-minute precision anyway.
 class NotificationService {
   NotificationService(this._plugin);
 

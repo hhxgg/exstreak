@@ -22,7 +22,8 @@ been uploaded to Google Play.**
 | ✅ | Store listing copy in `store/listing.md` |
 | ✅ | Privacy policy page in `store/privacy-policy.html` |
 | ✅ | Data safety and content rating answers in `store/data-safety.md` |
-| ✅ | Source pushed to https://github.com/hhxgg/exstreak |
+| ✅ | Privacy policy live at https://simonsvabenicky-lang.github.io/exstreak/privacy.html |
+| ✅ | Source pushed to https://github.com/simonsvabenicky-lang/exstreak |
 
 Build artefact:
 
@@ -66,30 +67,17 @@ an encrypted backup, not a cloud folder that syncs to a machine you might wipe.
 
 ---
 
-## Step 2 — Host the privacy policy (you, ~5 minutes)
+## Step 2 — Host the privacy policy — done
 
-Play requires a publicly reachable privacy policy URL. The page is already
-written at `store/privacy-policy.html`.
+Live at `https://simonsvabenicky-lang.github.io/exstreak/privacy.html`, served
+via GitHub Pages from the repo's `gh-pages` branch (`Settings → Pages` shows
+`Source: gh-pages, /`). `lib/core/branding.dart` points at that URL.
 
-The app already points at `https://hhxgg.github.io/exstreak/privacy.html`
-(see `lib/core/branding.dart`). To make that URL live via GitHub Pages:
-
-```bash
-cd D:\ExStreak
-git checkout --orphan gh-pages
-git rm -rf . --quiet
-mkdir -p .
-cp store/privacy-policy.html privacy.html
-git add privacy.html
-git commit -m "docs: publish privacy policy"
-git push -u origin gh-pages
-git checkout main
-```
-
-Then in the repo: **Settings → Pages → Source: `gh-pages` branch, `/ (root)`**.
-
-Give it a minute, then confirm the URL loads. If you host it elsewhere instead,
-update `Branding.privacyPolicyUrl` in `lib/core/branding.dart` and rebuild.
+If the repo ever changes owner or name again, the Pages URL changes with it —
+GitHub does not redirect `<owner>.github.io` addresses the way it redirects the
+repository's own web pages. Say so and the URL gets updated everywhere it's
+referenced (`branding.dart`, `store/listing.md`, this file) and re-verified
+live before it goes anywhere near Play Console again.
 
 ---
 

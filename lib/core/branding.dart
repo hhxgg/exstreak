@@ -15,6 +15,7 @@ abstract final class Branding {
 
   static const String supportEmail = 'simonsvabenicky@gmail.com';
   static const String privacyPolicyUrl =
-      'https://hhxgg.github.io/exstreak/privacy.html';
-  static const String sourceUrl = 'https://github.com/hhxgg/exstreak';
+      'https://simonsvabenicky-lang.github.io/exstreak/privacy.html';
+  static const String sourceUrl =
+      'https://github.com/simonsvabenicky-lang/exstreak';
 }

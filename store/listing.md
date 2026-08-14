@@ -160,8 +160,8 @@ Start with one set. That is the whole trick.
 - **App category:** Health & Fitness
 - **Tags:** Workout, Fitness, Habit tracker
 - **Contact email:** simonsvabenicky@gmail.com
-- **Website:** https://github.com/hhxgg/exstreak
-- **Privacy policy:** https://hhxgg.github.io/exstreak/privacy.html
+- **Website:** https://github.com/simonsvabenicky-lang/exstreak
+- **Privacy policy:** https://simonsvabenicky-lang.github.io/exstreak/privacy.html
 
 ---
 
